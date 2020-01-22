@@ -1,0 +1,21 @@
+{
+    "name": "alamin/sms",
+    "description": "SMS - A simple Laravel package.",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Al Amin",
+            "email": "ialamin.pro@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {},
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Alamin\\SMS\\SMSServiceProvider"
+            ]
+        }
+    }
+}
