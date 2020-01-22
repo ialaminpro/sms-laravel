@@ -22,7 +22,7 @@
 "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/ialaminpro/sms"
+            "url": "https://github.com/ialaminpro/sms-laravel"
         }
     ]
 "autoload": {
