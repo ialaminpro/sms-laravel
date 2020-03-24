@@ -22,12 +22,12 @@ class SMSController extends Controller
     {
 
         $parms = array(
-            'mobile' => '017877131',
-            'smsText' => 'Hi Saikat',
+            'mobile' => 'XXXXXXXXX',
+            'smsText' => 'Here your text',
             'mask' => '',
             'campaign' => '',
             'type' => '',
-            'client_id' => '4',
+            'client_id' => '',
         );
 
         $result = SMS::send($parms);
