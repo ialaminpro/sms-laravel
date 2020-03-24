@@ -35,7 +35,9 @@ php artisan vendor:publish
 
 php artisan migrate
 
-Route alamin/clients
+
+
+use Alamin\SMS\SMS;
 
 $parms = array(
             'mobile' => 'XXXXXXXXX',
@@ -46,4 +48,6 @@ $parms = array(
             'client_id' => '',
         );
 $result = SMS::send($parms);
+
+Route alamin/clients
 
