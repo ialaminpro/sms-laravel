@@ -37,3 +37,13 @@ php artisan migrate
 
 Route alamin/clients
 
+$parms = array(
+            'mobile' => 'XXXXXXXXX',
+            'smsText' => 'Here your text',
+            'mask' => '',
+            'campaign' => '',
+            'type' => '',
+            'client_id' => '',
+        );
+$result = SMS::send($parms);
+
