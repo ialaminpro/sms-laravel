@@ -2,6 +2,6 @@
 
 
 Route::get('timezones/{timezone?}',
-    'alamin\sms\SMSController@time');
+    'acolyte\sms\SMSController@time');
 
-Route::get('alamin/clients','alamin\sms\SMSController@index');
+Route::get('acolyte/clients','acolyte\sms\SMSController@index');
