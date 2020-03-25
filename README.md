@@ -1,43 +1,11 @@
-"require": {
-    "alamin/sms": "dev-master"
-    }    
- "repositories": [
-        {
-            "type": "path",
-            "url": "packages/alamin/sms",
-            "options": {
-                "symlink": true
-            }
-        }
-    ]
-    "autoload": {
-            "psr-4": {  
-                "Alamin\\SMS\\": "packages/alamin/sms/src/"
-            },
-        },
-        
-"require": {
-    "alamin/sms": "^1.0.0"
-    }
-"repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/ialaminpro/sms-laravel"
-        }
-    ]
-"autoload": {
-        "psr-4": {  
-            "Alamin\\SMS\\": "vendor/alamin/sms/src/"
-        },
-    },
+composer require acolyte/sms-laravel
         
 php artisan vendor:publish
 
 php artisan migrate
 
 
-
-use Alamin\SMS\SMS;
+use Acolyte\SMS\SMS;
 
 $parms = array(
             'mobile' => 'XXXXXXXXX',
@@ -49,5 +17,5 @@ $parms = array(
         );
 $result = SMS::send($parms);
 
-Route alamin/clients
+example.com/alamin/clients
 

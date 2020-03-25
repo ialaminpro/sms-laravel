@@ -1,6 +1,6 @@
 <?php
 
-namespace Alamin\SMS;
+namespace Acolyte\SMS;
 
 use Illuminate\Support\ServiceProvider;
 

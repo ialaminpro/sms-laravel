@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Alamin\SMS;
+namespace Acolyte\SMS;
 use DB;
 
 

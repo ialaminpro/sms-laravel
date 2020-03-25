@@ -1,5 +1,5 @@
 <?php
-namespace Alamin\SMS;
+namespace Acolyte\SMS;
 
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;

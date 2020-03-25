@@ -1,6 +1,6 @@
 <?php
 
-namespace Alamin\SMS\Models;
+namespace Acolyte\SMS\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
