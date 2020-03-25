@@ -27,5 +27,11 @@
                 "Alamin\\SMS\\SMSServiceProvider"
             ]
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/ialaminpro/sms-laravel",
+        }
+    ]
 }
