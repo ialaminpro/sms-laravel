@@ -20,7 +20,7 @@
         "psr-0": {
             "sms-laravel": "src"
         }
-    }
+    },
     "extra": {
         "laravel": {
             "providers": [
