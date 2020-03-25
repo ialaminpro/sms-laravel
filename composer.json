@@ -31,7 +31,7 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/ialaminpro/sms-laravel",
+            "url": "https://github.com/ialaminpro/sms-laravel"
         }
     ]
 }
