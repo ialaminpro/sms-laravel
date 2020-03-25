@@ -1,16 +1,26 @@
 {
-    "name": "alamin/sms",
+    "name": "alamin/sms-laravel",
     "description": "SMS - A simple Laravel package.",
+    "homepage": "https://github.com/ialaminpro/sms-laravel",
     "type": "project",
     "license": "MIT",
     "authors": [
         {
             "name": "Al Amin",
-            "email": "ialamin.pro@gmail.com"
+            "email": "ialamin.pro@gmail.com",
+            "homepage": "https://github.com/ialaminpro",
+            "role": "Developer"
         }
     ],
     "minimum-stability": "stable",
-    "require": {},
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "autoload": {
+        "psr-0": {
+            "sms-laravel": "src"
+        }
+    }
     "extra": {
         "laravel": {
             "providers": [
