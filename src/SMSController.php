@@ -4,8 +4,8 @@ namespace Acolyte\SMS;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use DB;
-use Alamin\SMS\SMS;
-use Alamin\SMS\Models\SMSModel;
+use Acolyte\SMS\SMS;
+use Acolyte\SMS\Models\SMSModel;
 
 class SMSController extends Controller
 {
@@ -14,7 +14,7 @@ class SMSController extends Controller
         $clients = SMSModel::get();
 
 //        return view('sms::index',compact('clients'));
-        return view('alamin/sms/index',compact('clients'));
+        return view('acolyte/sms/index',compact('clients'));
     }
 
 

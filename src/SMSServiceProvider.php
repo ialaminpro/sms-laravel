@@ -14,7 +14,7 @@ class SMSServiceProvider extends ServiceProvider
     public function register()
     {
         include __DIR__ . '/routes/web.php';
-        $this->app->make('Alamin\SMS\SMSController');
+        $this->app->make('Acolyte\SMS\SMSController');
     }
 
     /**
@@ -26,7 +26,7 @@ class SMSServiceProvider extends ServiceProvider
     {
         $this->loadViewsFrom(__DIR__ . '/views', 'sms');
         $this->publishes([
-            __DIR__ . '/views' => base_path('resources/views/alamin/sms'),
+            __DIR__ . '/views' => base_path('resources/views/acolyte/sms'),
             __DIR__ . '/migrations' => base_path('database/migrations'),
             __DIR__ . '/config' => base_path('config'),
         ]);
