@@ -18,7 +18,7 @@
     },
     "autoload": {
         "psr-0": {
-            "sms-laravel": "src"
+            "Alamin\\SMS\\": "src"
         }
     },
     "extra": {
