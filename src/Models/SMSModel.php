@@ -1,10 +1,10 @@
 <?php
 
-namespace Acolyte\SMS\Models;
+namespace Acolyte\SmsLaravel\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class SMSModel  extends Model
+class SmsModel  extends Model
 {
     public $timestamps = true;
     protected $table = 'sms';
