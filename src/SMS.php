@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Acolyte\SMS;
+namespace Acolyte\SmsLaravel;
 use DB;
 
 
