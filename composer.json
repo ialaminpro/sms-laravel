@@ -25,13 +25,13 @@
     },
     "autoload": {
         "psr-0": {
-            "Acolyte\\SMS\\": "src"
+            "Acolyte\\SmsLaravel\\": "src"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Acolyte\\SMS\\SMSServiceProvider"
+                "Acolyte\\SmsLaravel\\SmsServiceProvider"
             ]
         }
     },
