@@ -1,10 +1,10 @@
 <?php
 
-namespace Acolyte\SMS;
+namespace Acolyte\SmsLaravel;
 
 use Illuminate\Support\ServiceProvider;
 
-class SMSServiceProvider extends ServiceProvider
+class SmsServiceProvider extends ServiceProvider
 {
     /**
      * Register services.
@@ -14,7 +14,7 @@ class SMSServiceProvider extends ServiceProvider
     public function register()
     {
         include __DIR__ . '/routes/web.php';
-        $this->app->make('Acolyte\SMS\SMSController');
+        $this->app->make('Acolyte\SmsLaravel\SmsController');
     }
 
     /**
