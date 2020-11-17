@@ -1,17 +1,17 @@
 <?php
-namespace Acolyte\SMS;
+namespace Acolyte\SmsLaravel;
 
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use DB;
-use Acolyte\SMS\SMS;
-use Acolyte\SMS\Models\SMSModel;
+use Acolyte\SmsLaravel\SMS;
+use Acolyte\SmsLaravel\Models\SmsModel;
 
-class SMSController extends Controller
+class SmsController extends Controller
 {
     public function index()
     {
-        $clients = SMSModel::get();
+        $clients = SmsModel::get();
 
 //        return view('sms::index',compact('clients'));
         return view('acolyte/sms/index',compact('clients'));
