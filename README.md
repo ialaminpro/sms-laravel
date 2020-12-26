@@ -5,7 +5,7 @@ php artisan vendor:publish
 php artisan migrate
 
 
-use Acolyte\SMS\SMS;
+use Acolyte\SmsLaravel\SMS;
 
 $parms = array(
             'mobile' => 'XXXXXXXXX',
