@@ -1,14 +1,15 @@
 {
     "name": "acolyte/sms-laravel",
-    "description": "SMS - A simple Laravel package.",
-    "homepage": "https://github.com/ialaminpro/sms-laravel",
+    "description": "Laravel-native multi-provider SMS package with typed results, queues, events, and accurate message segmentation.",
     "keywords": [
-		"sms",
-		"sms api",
-		"alamin",
-		"laravel sms",
-		"message"
-	],
+        "laravel",
+        "sms",
+        "sms-gateway",
+        "notifications",
+        "queue",
+        "messaging"
+    ],
+    "homepage": "https://github.com/ialaminpro/sms-laravel",
     "license": "MIT",
     "authors": [
         {
@@ -18,27 +19,60 @@
             "role": "Developer"
         }
     ],
-    "minimum-stability": "dev",
-    "prefer-stable": true,
     "require": {
-        "php": ">=5.3.0"
+        "php": "^8.2",
+        "illuminate/bus": "^12.0 || ^13.0",
+        "illuminate/config": "^12.0 || ^13.0",
+        "illuminate/contracts": "^12.0 || ^13.0",
+        "illuminate/http": "^12.0 || ^13.0",
+        "illuminate/notifications": "^12.0 || ^13.0",
+        "illuminate/queue": "^12.0 || ^13.0",
+        "illuminate/support": "^12.0 || ^13.0"
+    },
+    "require-dev": {
+        "larastan/larastan": "^3.0",
+        "laravel/pint": "^1.18",
+        "mockery/mockery": "^1.6",
+        "orchestra/testbench": "^10.11 || ^11.2",
+        "phpunit/phpunit": "^11.5.50 || ^12.5.8 || ^13.0"
     },
     "autoload": {
         "psr-4": {
-            "Acolyte\\SmsLaravel\\": "src"
+            "Acolyte\\SmsLaravel\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Acolyte\\SmsLaravel\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
                 "Acolyte\\SmsLaravel\\SmsServiceProvider"
-            ]
+            ],
+            "aliases": {
+                "Sms": "Acolyte\\SmsLaravel\\Facades\\Sms"
+            }
         }
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/ialaminpro/sms-laravel"
-        }
-    ]
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "analyse": "vendor/bin/phpstan analyse --memory-limit=1G",
+        "format": "vendor/bin/pint",
+        "format:test": "vendor/bin/pint --test",
+        "check": [
+            "@format:test",
+            "@analyse",
+            "@test",
+            "composer audit"
+        ]
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": false
+        },
+        "sort-packages": true
+    },
+    "prefer-stable": true
 }
