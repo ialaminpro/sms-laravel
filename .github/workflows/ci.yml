@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [master, 2.x]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: PHP ${{ matrix.php }} / Laravel ${{ matrix.laravel }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - php: '8.2'
+            laravel: '12'
+            testbench: '^10.11'
+          - php: '8.3'
+            laravel: '12'
+            testbench: '^10.11'
+          - php: '8.3'
+            laravel: '13'
+            testbench: '^11.2'
+          - php: '8.4'
+            laravel: '12'
+            testbench: '^10.11'
+          - php: '8.4'
+            laravel: '13'
+            testbench: '^11.2'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: composer:v2
+      - run: composer require "orchestra/testbench:${{ matrix.testbench }}" --dev --no-update --no-interaction
+      - run: composer update --prefer-dist --no-interaction --no-progress
+      - run: composer test
+
+  quality:
+    name: Quality / Laravel 13
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: composer:v2
+      - run: composer validate --strict
+      - run: composer require "orchestra/testbench:^11.2" --dev --no-update --no-interaction
+      - run: composer update --prefer-dist --no-interaction --no-progress
+      - run: composer format:test
+      - run: composer analyse
+      - run: composer test
+      - run: composer audit
+
+  lowest:
+    name: Lowest dependencies / PHP 8.2 / Laravel 12
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+          tools: composer:v2
+      - run: composer require "orchestra/testbench:^10.11" --dev --no-update --no-interaction
+      - run: composer update --prefer-lowest --prefer-stable --no-interaction --no-progress
+      - run: composer test
