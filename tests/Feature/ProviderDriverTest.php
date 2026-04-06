@@ -1,0 +1,159 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Acolyte\SmsLaravel\Tests\Feature;
+
+use Acolyte\SmsLaravel\Data\SmsMessage;
+use Acolyte\SmsLaravel\Drivers\LegacyProviderDriver;
+use Acolyte\SmsLaravel\Tests\TestCase;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\Factory;
+use Illuminate\Http\Client\Request;
+use Illuminate\Support\Facades\Http;
+use PHPUnit\Framework\Attributes\DataProvider;
+
+final class ProviderDriverTest extends TestCase
+{
+    public function test_successful_legacy_response_is_mapped_and_request_is_safe(): void
+    {
+        Http::fake(['sms.example.test/*' => Http::response('1900||message-42', 200)]);
+
+        $result = $this->driver()->send(new SmsMessage('+49 123', 'Hello', 'Acme'));
+
+        self::assertTrue($result->successful);
+        self::assertSame('message-42', $result->providerMessageId);
+        Http::assertSent(function (Request $request): bool {
+            return $request->method() === 'POST'
+                && $request->hasHeader('X-API-Key', 'secret-token')
+                && ! str_contains($request->url(), 'secret-token')
+                && $request['mobile'] === '+49123'
+                && $request['smsText'] === 'Hello';
+        });
+    }
+
+    public function test_json_success_is_mapped(): void
+    {
+        Http::fake(['*' => Http::response(['success' => true, 'message_id' => 'json-1'])]);
+
+        $result = $this->driver()->send(new SmsMessage('+49123', 'Hello'));
+
+        self::assertTrue($result->successful);
+        self::assertSame('json-1', $result->providerMessageId);
+    }
+
+    /** @return iterable<string, array{int, string}> */
+    public static function httpFailures(): iterable
+    {
+        yield 'invalid request' => [422, 'invalid_request'];
+        yield 'authentication' => [401, 'authentication_failure'];
+        yield 'balance' => [402, 'insufficient_provider_balance'];
+        yield 'rate limit' => [429, 'rate_limited'];
+        yield 'server' => [503, 'provider_server_error'];
+    }
+
+    #[DataProvider('httpFailures')]
+    public function test_http_failures_are_typed(int $status, string $expectedCode): void
+    {
+        Http::fake(['*' => Http::response('sensitive raw provider response', $status)]);
+
+        $result = $this->driver()->send(new SmsMessage('+49123', 'Hello'));
+
+        self::assertFalse($result->successful);
+        self::assertSame($expectedCode, $result->errorCode);
+        self::assertStringNotContainsString('sensitive', $result->errorMessage ?? '');
+        self::assertSame(['http_status' => $status], $result->metadata);
+    }
+
+    public function test_provider_failure_code_is_mapped_without_raw_body(): void
+    {
+        Http::fake(['*' => Http::response('1902||ignored||secret detail')]);
+
+        $result = $this->driver()->send(new SmsMessage('+49123', 'Hello'));
+
+        self::assertSame('authentication_failure', $result->errorCode);
+        self::assertSame(['provider_code' => '1902'], $result->metadata);
+    }
+
+    public function test_retry_policy_is_limited_to_transient_failures(): void
+    {
+        Http::fakeSequence()
+            ->push('', 503)
+            ->push('1900||after-retry', 200);
+        $driver = new LegacyProviderDriver(
+            $this->application()->make(Factory::class),
+            'https://sms.example.test/send',
+            'secret-token',
+            retries: 2,
+            retryDelay: 0,
+        );
+
+        $result = $driver->send(new SmsMessage('+49123', 'Hello'));
+
+        self::assertSame('after-retry', $result->providerMessageId);
+        Http::assertSentCount(2);
+    }
+
+    public function test_retry_policy_does_not_retry_permanent_failures(): void
+    {
+        Http::fake(['*' => Http::response('', 401)]);
+        $driver = new LegacyProviderDriver(
+            $this->application()->make(Factory::class),
+            'https://sms.example.test/send',
+            'secret-token',
+            retries: 2,
+            retryDelay: 0,
+        );
+        $driver->send(new SmsMessage('+49123', 'Hello'));
+        Http::assertSentCount(1);
+    }
+
+    public function test_malformed_response_is_reported(): void
+    {
+        Http::fake(['*' => Http::response('', 200)]);
+
+        $result = $this->driver()->send(new SmsMessage('+49123', 'Hello'));
+
+        self::assertSame('invalid_provider_response', $result->errorCode);
+    }
+
+    public function test_timeout_is_reported_without_leaking_exception_details(): void
+    {
+        Http::fake(fn () => throw new ConnectionException('cURL error 28: Operation timed out with api key secret-token'));
+
+        $result = $this->driver()->send(new SmsMessage('+49123', 'Hello'));
+
+        self::assertSame('provider_timeout', $result->errorCode);
+        self::assertStringNotContainsString('secret-token', $result->errorMessage ?? '');
+    }
+
+    public function test_network_failure_is_reported(): void
+    {
+        Http::fake(fn () => throw new ConnectionException('Could not resolve host'));
+
+        $result = $this->driver()->send(new SmsMessage('+49123', 'Hello'));
+
+        self::assertSame('network_failure', $result->errorCode);
+    }
+
+    public function test_missing_configuration_fails_before_an_http_request(): void
+    {
+        Http::fake();
+        $driver = new LegacyProviderDriver($this->application()->make(Factory::class), '', '');
+
+        $result = $driver->send(new SmsMessage('+49123', 'Hello'));
+
+        self::assertSame('configuration_error', $result->errorCode);
+        Http::assertNothingSent();
+    }
+
+    private function driver(): LegacyProviderDriver
+    {
+        return new LegacyProviderDriver(
+            $this->application()->make(Factory::class),
+            'https://sms.example.test/send',
+            'secret-token',
+            retries: 0,
+        );
+    }
+}
