@@ -63,18 +63,19 @@ Laravel discovers the service provider and `Sms` facade automatically.
 Add provider-specific values to `.env`:
 
 ```dotenv
-SMS_DRIVER=provider
-SMS_PROVIDER_URL=https://provider.example/v1/messages
-SMS_PROVIDER_API_KEY=replace-me
-SMS_PROVIDER_API_KEY_HEADER=X-API-Key
-SMS_PROVIDER_SENDER=Acme
-SMS_PROVIDER_CONNECT_TIMEOUT=3
-SMS_PROVIDER_TIMEOUT=10
-SMS_PROVIDER_RETRIES=2
-SMS_PROVIDER_RETRY_DELAY=200
+SMS_DRIVER=onnorokom
+SMS_ONNOROKOM_URL=https://api2.onnorokomsms.com/sendsms.asmx
+SMS_ONNOROKOM_API_KEY=replace-me
+SMS_ONNOROKOM_SENDER=Acme
+SMS_ONNOROKOM_CONNECT_TIMEOUT=3
+SMS_ONNOROKOM_TIMEOUT=10
+SMS_ONNOROKOM_RETRIES=2
+SMS_ONNOROKOM_RETRY_DELAY=200
 ```
 
-The API key is sent in a header and is never added to the request URL. Confirm the endpoint, authentication header, payload, and response codes against your provider before production use; providers derived from the historical gateway may require a custom driver.
+The bundled `onnorokom` driver implements the provider's published SOAP `NumberSms` contract. Its API key is XML-escaped inside the HTTPS request body and is never added to the request URL. The driver automatically selects the provider's `TEXT` or `UCS` mode using the segment calculator.
+
+Do not disable TLS certificate verification. Confirm the provider endpoint has a valid, trusted certificate chain before production deployment; if it does not, contact the provider or select a custom driver.
 
 ## Quick Start
 
@@ -237,15 +238,14 @@ Database logging is not required or bundled. Persist or observe sends with event
 
 | Key | Environment variable | Default | Purpose |
 | --- | --- | --- | --- |
-| `default` | `SMS_DRIVER` | `provider` | Default driver name |
-| `drivers.provider.base_url` | `SMS_PROVIDER_URL` | empty | Provider message endpoint |
-| `drivers.provider.api_key` | `SMS_PROVIDER_API_KEY` | empty | Secret credential |
-| `drivers.provider.api_key_header` | `SMS_PROVIDER_API_KEY_HEADER` | `X-API-Key` | Authentication header |
-| `drivers.provider.sender` | `SMS_PROVIDER_SENDER` | `null` | Default sender |
-| `drivers.provider.connect_timeout` | `SMS_PROVIDER_CONNECT_TIMEOUT` | `3` | Connection timeout in seconds |
-| `drivers.provider.timeout` | `SMS_PROVIDER_TIMEOUT` | `10` | Total timeout in seconds |
-| `drivers.provider.retries` | `SMS_PROVIDER_RETRIES` | `2` | Transient retry count |
-| `drivers.provider.retry_delay` | `SMS_PROVIDER_RETRY_DELAY` | `200` | Retry delay in milliseconds |
+| `default` | `SMS_DRIVER` | `onnorokom` | Default driver name |
+| `drivers.onnorokom.base_url` | `SMS_ONNOROKOM_URL` | official SOAP endpoint | Provider service endpoint |
+| `drivers.onnorokom.api_key` | `SMS_ONNOROKOM_API_KEY` | empty | Secret credential |
+| `drivers.onnorokom.sender` | `SMS_ONNOROKOM_SENDER` | `null` | Default mask/sender |
+| `drivers.onnorokom.connect_timeout` | `SMS_ONNOROKOM_CONNECT_TIMEOUT` | `3` | Connection timeout in seconds |
+| `drivers.onnorokom.timeout` | `SMS_ONNOROKOM_TIMEOUT` | `10` | Total timeout in seconds |
+| `drivers.onnorokom.retries` | `SMS_ONNOROKOM_RETRIES` | `2` | Transient retry count |
+| `drivers.onnorokom.retry_delay` | `SMS_ONNOROKOM_RETRY_DELAY` | `200` | Retry delay in milliseconds |
 | `queue.connection` | `SMS_QUEUE_CONNECTION` | `null` | Laravel queue connection |
 | `queue.queue` | `SMS_QUEUE` | `null` | Queue name |
 | `queue.tries` | `SMS_QUEUE_TRIES` | `3` | Job attempt limit |

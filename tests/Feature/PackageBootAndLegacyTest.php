@@ -16,7 +16,7 @@ final class PackageBootAndLegacyTest extends TestCase
 {
     public function test_package_loads_config_and_manager_without_database_coupling(): void
     {
-        self::assertSame('provider', config('sms.default'));
+        self::assertSame('onnorokom', config('sms.default'));
         self::assertInstanceOf(SmsManager::class, $this->application()->make('sms'));
         self::assertInstanceOf(SmsChannel::class, $this->application()->make(ChannelManager::class)->driver('sms'));
         self::assertFalse($this->application()->make(Router::class)->getRoutes()->hasNamedRoute('sms.index'));
@@ -24,7 +24,7 @@ final class PackageBootAndLegacyTest extends TestCase
 
     public function test_legacy_array_api_adapts_to_typed_manager(): void
     {
-        Http::fake(['*' => Http::response('1900||legacy-id')]);
+        Http::fake(['*' => Http::response($this->soapResponse('1900||+49123||legacy-id'))]);
 
         $json = SMS::send([
             'mobile' => '+49123',

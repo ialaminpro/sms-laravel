@@ -23,11 +23,11 @@ final class SmsQueueTest extends TestCase
         $config->set('sms.queue.connection', 'redis');
         $config->set('sms.queue.queue', 'outbound-sms');
 
-        $this->application()->make(SmsManager::class)->queue(new SmsMessage('+49123', 'Queued'), 'provider');
+        $this->application()->make(SmsManager::class)->queue(new SmsMessage('+49123', 'Queued'), 'onnorokom');
 
         Bus::assertDispatched(SendSmsJob::class, function (SendSmsJob $job): bool {
             return $job->message->to === '+49123'
-                && $job->driver === 'provider'
+                && $job->driver === 'onnorokom'
                 && $job->connection === 'redis'
                 && $job->queue === 'outbound-sms';
         });

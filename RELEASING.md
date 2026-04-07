@@ -11,3 +11,7 @@ Releases are a maintainer-only operation. Never tag from a dirty worktree.
 7. Confirm Packagist receives the release and that installation works in a fresh supported Laravel application.
 
 For the current `2.x` branch, the planned first stable tag is `2.0.0`. This repository does not tag or publish releases automatically.
+
+## Current Provider Blocker
+
+On 2026-08-23, the public OnnoRokom WSDL confirmed the `NumberSms` SOAP contract, but repeated TLS-verified requests to the service endpoint subsequently failed with an incomplete/untrusted issuer chain. Do not bypass verification. A credentialed non-production delivery test remains blocked until the provider repairs TLS and supplies a sandbox account.

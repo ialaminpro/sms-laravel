@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Acolyte\SmsLaravel\Tests\Feature;
 
 use Acolyte\SmsLaravel\Data\SmsMessage;
-use Acolyte\SmsLaravel\Drivers\LegacyProviderDriver;
+use Acolyte\SmsLaravel\Drivers\OnnoRokomDriver;
+use Acolyte\SmsLaravel\Support\SmsSegmentCalculator;
 use Acolyte\SmsLaravel\Tests\TestCase;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Factory;
@@ -17,7 +18,7 @@ final class ProviderDriverTest extends TestCase
 {
     public function test_successful_legacy_response_is_mapped_and_request_is_safe(): void
     {
-        Http::fake(['sms.example.test/*' => Http::response('1900||message-42', 200)]);
+        Http::fake(['sms.example.test/*' => Http::response($this->soapResponse('1900||+49123||message-42'), 200)]);
 
         $result = $this->driver()->send(new SmsMessage('+49 123', 'Hello', 'Acme'));
 
@@ -25,21 +26,40 @@ final class ProviderDriverTest extends TestCase
         self::assertSame('message-42', $result->providerMessageId);
         Http::assertSent(function (Request $request): bool {
             return $request->method() === 'POST'
-                && $request->hasHeader('X-API-Key', 'secret-token')
+                && $request->hasHeader('SOAPAction', '"http://api.onnorokomsms.com/NumberSms"')
                 && ! str_contains($request->url(), 'secret-token')
-                && $request['mobile'] === '+49123'
-                && $request['smsText'] === 'Hello';
+                && str_contains($request->body(), '<apiKey>secret-token</apiKey>')
+                && str_contains($request->body(), '<numberList>+49123</numberList>')
+                && str_contains($request->body(), '<messageText>Hello</messageText>')
+                && str_contains($request->body(), '<smsType>TEXT</smsType>');
         });
     }
 
-    public function test_json_success_is_mapped(): void
+    public function test_namespaced_soap_success_is_mapped(): void
     {
-        Http::fake(['*' => Http::response(['success' => true, 'message_id' => 'json-1'])]);
+        $xml = '<soap:Envelope xmlns:soap="urn:soap"><soap:Body>'
+            .'<x:NumberSmsResult xmlns:x="urn:result">1900||+49123||soap-1</x:NumberSmsResult>'
+            .'</soap:Body></soap:Envelope>';
+        Http::fake(['*' => Http::response($xml)]);
 
         $result = $this->driver()->send(new SmsMessage('+49123', 'Hello'));
 
         self::assertTrue($result->successful);
-        self::assertSame('json-1', $result->providerMessageId);
+        self::assertSame('soap-1', $result->providerMessageId);
+    }
+
+    public function test_soap_payload_escapes_values_and_selects_ucs_for_unicode(): void
+    {
+        Http::fake(['*' => Http::response($this->soapResponse('1900||+49123||ucs-1'))]);
+
+        $this->driver()->send(new SmsMessage('+49123', 'হ<&', 'A&B', 'ref<1'));
+
+        Http::assertSent(function (Request $request): bool {
+            return str_contains($request->body(), '<messageText>হ&lt;&amp;</messageText>')
+                && str_contains($request->body(), '<smsType>UCS</smsType>')
+                && str_contains($request->body(), '<maskName>A&amp;B</maskName>')
+                && str_contains($request->body(), '<campaignName>ref&lt;1</campaignName>');
+        });
     }
 
     /** @return iterable<string, array{int, string}> */
@@ -67,7 +87,7 @@ final class ProviderDriverTest extends TestCase
 
     public function test_provider_failure_code_is_mapped_without_raw_body(): void
     {
-        Http::fake(['*' => Http::response('1902||ignored||secret detail')]);
+        Http::fake(['*' => Http::response($this->soapResponse('1902||ignored||secret detail'))]);
 
         $result = $this->driver()->send(new SmsMessage('+49123', 'Hello'));
 
@@ -79,9 +99,10 @@ final class ProviderDriverTest extends TestCase
     {
         Http::fakeSequence()
             ->push('', 503)
-            ->push('1900||after-retry', 200);
-        $driver = new LegacyProviderDriver(
+            ->push($this->soapResponse('1900||+49123||after-retry'), 200);
+        $driver = new OnnoRokomDriver(
             $this->application()->make(Factory::class),
+            new SmsSegmentCalculator,
             'https://sms.example.test/send',
             'secret-token',
             retries: 2,
@@ -97,8 +118,9 @@ final class ProviderDriverTest extends TestCase
     public function test_retry_policy_does_not_retry_permanent_failures(): void
     {
         Http::fake(['*' => Http::response('', 401)]);
-        $driver = new LegacyProviderDriver(
+        $driver = new OnnoRokomDriver(
             $this->application()->make(Factory::class),
+            new SmsSegmentCalculator,
             'https://sms.example.test/send',
             'secret-token',
             retries: 2,
@@ -139,7 +161,12 @@ final class ProviderDriverTest extends TestCase
     public function test_missing_configuration_fails_before_an_http_request(): void
     {
         Http::fake();
-        $driver = new LegacyProviderDriver($this->application()->make(Factory::class), '', '');
+        $driver = new OnnoRokomDriver(
+            $this->application()->make(Factory::class),
+            new SmsSegmentCalculator,
+            '',
+            '',
+        );
 
         $result = $driver->send(new SmsMessage('+49123', 'Hello'));
 
@@ -147,10 +174,11 @@ final class ProviderDriverTest extends TestCase
         Http::assertNothingSent();
     }
 
-    private function driver(): LegacyProviderDriver
+    private function driver(): OnnoRokomDriver
     {
-        return new LegacyProviderDriver(
+        return new OnnoRokomDriver(
             $this->application()->make(Factory::class),
+            new SmsSegmentCalculator,
             'https://sms.example.test/send',
             'secret-token',
             retries: 0,

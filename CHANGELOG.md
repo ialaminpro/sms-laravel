@@ -14,7 +14,7 @@ All notable changes are documented here. This project follows [Semantic Versioni
 ### Changed
 
 - PHP now requires 8.2 or newer; supported Laravel versions are 12–13.
-- Provider transport now uses Laravel's HTTP client with header authentication, timeouts, and bounded retries.
+- OnnoRokom transport now uses its published SOAP contract through Laravel's HTTP client, with body authentication, timeouts, and bounded retries.
 - Expected provider errors now return stable typed failure codes.
 
 ### Fixed

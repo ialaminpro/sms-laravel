@@ -12,6 +12,15 @@ use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra
 {
+    protected function soapResponse(string $result): string
+    {
+        return '<?xml version="1.0" encoding="utf-8"?>'
+            .'<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">'
+            .'<soap:Body><NumberSmsResponse xmlns="http://api.onnorokomsms.com/">'
+            .'<NumberSmsResult>'.htmlspecialchars($result, ENT_XML1 | ENT_QUOTES, 'UTF-8').'</NumberSmsResult>'
+            .'</NumberSmsResponse></soap:Body></soap:Envelope>';
+    }
+
     protected function application(): Application
     {
         if (! $this->app instanceof Application) {
@@ -33,8 +42,8 @@ abstract class TestCase extends Orchestra
     /** @param  Application  $app */
     protected function defineEnvironment($app): void
     {
-        $app['config']->set('sms.drivers.provider.base_url', 'https://sms.example.test/send');
-        $app['config']->set('sms.drivers.provider.api_key', 'secret-token');
-        $app['config']->set('sms.drivers.provider.retries', 0);
+        $app['config']->set('sms.drivers.onnorokom.base_url', 'https://sms.example.test/sendsms.asmx');
+        $app['config']->set('sms.drivers.onnorokom.api_key', 'secret-token');
+        $app['config']->set('sms.drivers.onnorokom.retries', 0);
     }
 }

@@ -3,18 +3,17 @@
 declare(strict_types=1);
 
 return [
-    'default' => env('SMS_DRIVER', 'provider'),
+    'default' => env('SMS_DRIVER', 'onnorokom'),
 
     'drivers' => [
-        'provider' => [
-            'base_url' => env('SMS_PROVIDER_URL', ''),
-            'api_key' => env('SMS_PROVIDER_API_KEY', ''),
-            'api_key_header' => env('SMS_PROVIDER_API_KEY_HEADER', 'X-API-Key'),
-            'sender' => env('SMS_PROVIDER_SENDER'),
-            'connect_timeout' => (int) env('SMS_PROVIDER_CONNECT_TIMEOUT', 3),
-            'timeout' => (int) env('SMS_PROVIDER_TIMEOUT', 10),
-            'retries' => (int) env('SMS_PROVIDER_RETRIES', 2),
-            'retry_delay' => (int) env('SMS_PROVIDER_RETRY_DELAY', 200),
+        'onnorokom' => [
+            'base_url' => env('SMS_ONNOROKOM_URL', 'https://api2.onnorokomsms.com/sendsms.asmx'),
+            'api_key' => env('SMS_ONNOROKOM_API_KEY', ''),
+            'sender' => env('SMS_ONNOROKOM_SENDER'),
+            'connect_timeout' => (int) env('SMS_ONNOROKOM_CONNECT_TIMEOUT', 3),
+            'timeout' => (int) env('SMS_ONNOROKOM_TIMEOUT', 10),
+            'retries' => (int) env('SMS_ONNOROKOM_RETRIES', 2),
+            'retry_delay' => (int) env('SMS_ONNOROKOM_RETRY_DELAY', 200),
         ],
     ],
 

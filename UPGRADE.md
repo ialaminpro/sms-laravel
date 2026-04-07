@@ -6,7 +6,7 @@ Version 2 separates reusable SMS transport from the original application's billi
 
 ### Runtime requirements
 
-Upgrade to PHP 8.2+ and Laravel 12–13, then require `acolyte/sms-laravel:^2.0`. Publish the new configuration with `php artisan vendor:publish --tag=sms-config` and replace the generic 1.x environment variables with the `SMS_PROVIDER_*` variables documented in the README.
+Upgrade to PHP 8.2+ and Laravel 12–13, then require `acolyte/sms-laravel:^2.0`. Publish the new configuration with `php artisan vendor:publish --tag=sms-config` and replace the generic 1.x environment variables with the `SMS_ONNOROKOM_*` variables documented in the README.
 
 ### Sending API
 
@@ -42,7 +42,7 @@ The compatibility adapter still accepts `mobile`, `smsText`, `mask`, and `campai
 
 ### Provider integration
 
-The bundled driver sends a form-encoded POST request and authenticates with the configured header. The 1.x query-string GET protocol is not retained because it exposed API keys in URLs. Verify that your provider accepts the v2 contract. If its protocol differs, implement `SmsDriver`; do not put credentials back into query parameters.
+The bundled driver sends the provider's published SOAP `NumberSms` request through Laravel's HTTP client. The 1.x query-string protocol is not retained because it exposed API keys in URLs. The API key now travels inside the XML request body over HTTPS. If using a different provider, implement `SmsDriver`; do not put credentials into query parameters.
 
 ### Billing and balances
 

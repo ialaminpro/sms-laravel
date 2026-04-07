@@ -20,12 +20,12 @@ final class SmsManagerAndEventsTest extends TestCase
 {
     public function test_default_driver_resolves_and_sends(): void
     {
-        Http::fake(['*' => Http::response('1900||default-id')]);
+        Http::fake(['*' => Http::response($this->soapResponse('1900||+49123||default-id'))]);
         $manager = $this->application()->make(SmsManager::class);
 
         $result = $manager->send(new SmsMessage('+49123', 'Hello'));
 
-        self::assertSame('provider', $manager->getDefaultDriver());
+        self::assertSame('onnorokom', $manager->getDefaultDriver());
         self::assertSame('default-id', $result->providerMessageId);
     }
 
@@ -48,11 +48,11 @@ final class SmsManagerAndEventsTest extends TestCase
     public function test_success_events_are_dispatched_with_driver_context(): void
     {
         Event::fake();
-        Http::fake(['*' => Http::response('1900||event-id')]);
+        Http::fake(['*' => Http::response($this->soapResponse('1900||+49123||event-id'))]);
 
         $this->application()->make(SmsManager::class)->send(new SmsMessage('+49123', 'Hello'));
 
-        Event::assertDispatched(SmsSending::class, fn (SmsSending $event): bool => $event->driver === 'provider');
+        Event::assertDispatched(SmsSending::class, fn (SmsSending $event): bool => $event->driver === 'onnorokom');
         Event::assertDispatched(SmsSent::class, fn (SmsSent $event): bool => $event->result->providerMessageId === 'event-id');
         Event::assertNotDispatched(SmsFailed::class);
     }

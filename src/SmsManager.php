@@ -7,11 +7,12 @@ namespace Acolyte\SmsLaravel;
 use Acolyte\SmsLaravel\Contracts\SmsDriver;
 use Acolyte\SmsLaravel\Data\SmsMessage;
 use Acolyte\SmsLaravel\Data\SmsResult;
-use Acolyte\SmsLaravel\Drivers\LegacyProviderDriver;
+use Acolyte\SmsLaravel\Drivers\OnnoRokomDriver;
 use Acolyte\SmsLaravel\Events\SmsFailed;
 use Acolyte\SmsLaravel\Events\SmsSending;
 use Acolyte\SmsLaravel\Events\SmsSent;
 use Acolyte\SmsLaravel\Jobs\SendSmsJob;
+use Acolyte\SmsLaravel\Support\SmsSegmentCalculator;
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcher;
 use Illuminate\Contracts\Container\Container;
@@ -34,9 +35,9 @@ final class SmsManager extends Manager
 
     public function getDefaultDriver(): string
     {
-        $driver = $this->configuration->get('sms.default', 'provider');
+        $driver = $this->configuration->get('sms.default', 'onnorokom');
 
-        return is_string($driver) ? $driver : 'provider';
+        return is_string($driver) ? $driver : 'onnorokom';
     }
 
     public function driver($driver = null): SmsDriver
@@ -89,18 +90,18 @@ final class SmsManager extends Manager
         $this->bus->dispatch($job);
     }
 
-    protected function createProviderDriver(): SmsDriver
+    protected function createOnnorokomDriver(): SmsDriver
     {
-        return new LegacyProviderDriver(
+        return new OnnoRokomDriver(
             http: $this->container->make(Factory::class),
-            baseUrl: $this->stringConfig('sms.drivers.provider.base_url'),
-            apiKey: $this->stringConfig('sms.drivers.provider.api_key'),
-            defaultSender: $this->nullableStringConfig('sms.drivers.provider.sender'),
-            connectTimeout: $this->integerConfig('sms.drivers.provider.connect_timeout', 3),
-            timeout: $this->integerConfig('sms.drivers.provider.timeout', 10),
-            retries: $this->integerConfig('sms.drivers.provider.retries', 2),
-            retryDelay: $this->integerConfig('sms.drivers.provider.retry_delay', 200),
-            apiKeyHeader: $this->stringConfig('sms.drivers.provider.api_key_header', 'X-API-Key'),
+            segments: $this->container->make(SmsSegmentCalculator::class),
+            baseUrl: $this->stringConfig('sms.drivers.onnorokom.base_url'),
+            apiKey: $this->stringConfig('sms.drivers.onnorokom.api_key'),
+            defaultSender: $this->nullableStringConfig('sms.drivers.onnorokom.sender'),
+            connectTimeout: $this->integerConfig('sms.drivers.onnorokom.connect_timeout', 3),
+            timeout: $this->integerConfig('sms.drivers.onnorokom.timeout', 10),
+            retries: $this->integerConfig('sms.drivers.onnorokom.retries', 2),
+            retryDelay: $this->integerConfig('sms.drivers.onnorokom.retry_delay', 200),
         );
     }
 
