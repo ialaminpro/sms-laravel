@@ -4,6 +4,8 @@ All notable changes are documented here. This project follows [Semantic Versioni
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-08-23
+
 ### Added
 
 - Laravel-style `SmsManager`, driver selection, and runtime driver extension.
@@ -41,5 +43,6 @@ All notable changes are documented here. This project follows [Semantic Versioni
 
 Historical 1.x release. See the Git history for legacy changes.
 
-[Unreleased]: https://github.com/ialaminpro/sms-laravel/compare/1.0.2...2.x
+[Unreleased]: https://github.com/ialaminpro/sms-laravel/compare/2.0.0...2.x
+[2.0.0]: https://github.com/ialaminpro/sms-laravel/compare/1.0.2...2.0.0
 [1.0.2]: https://github.com/ialaminpro/sms-laravel/releases/tag/1.0.2
