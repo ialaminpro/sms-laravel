@@ -37,7 +37,7 @@ jobs:
             laravel: '13'
             testbench: '^11.2'
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
@@ -51,7 +51,7 @@ jobs:
     name: Quality / Laravel 13
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
@@ -69,7 +69,7 @@ jobs:
     name: Lowest dependencies / PHP 8.2 / Laravel 12
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
